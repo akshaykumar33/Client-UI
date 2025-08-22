@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+
 import {
-  Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Box, Typography
+  Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Box, Typography, Divider,
 } from "@mui/material";
 import { DndContext, useSensor, useSensors, PointerSensor, closestCenter } from "@dnd-kit/core";
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -21,51 +21,51 @@ const ALL_FIELDS = [
   { id: "clientId", label: "Client ID", icon: <InsertInvitationIcon />, type: "alpha", defaultDir: "asc" as Direction },
 ] as const;
 
-// Used for both draggable active and clickable disabled rows
 function SortRow({
-  id, direction, label, icon, type, active,
-  onToggle, onRemove, onSelect, listeners, attributes, isDragging
+  id, direction, label, icon, type, active, onToggle, onRemove, onSelect, listeners, attributes, isDragging,
 }: any) {
   return (
     <Box
       sx={{
         display: "flex", alignItems: "center",
-        py: 1, mb: 0.6, cursor: active ? "grab" : "pointer",
-        opacity: isDragging ? 0.66 : 1,
+        py: 1, mb: 0.3,
+        cursor: active ? "grab" : "pointer",
+        opacity: isDragging ? 0.75 : 1,
         background: active ? "#fff" : "#fafbfc",
-        borderRadius: 2, boxShadow: isDragging ? "0 2px 18px rgba(30,41,59,0.10)" : "none",
-        "&:hover": { background: "#f7fafd" }, transition: "background 0.15s, box-shadow 0.18s"
+        borderRadius: 2,
+        boxShadow: isDragging ? "0 2px 18px rgba(30,41,59,0.13)" : "none",
+        fontFamily: "Inter,sans-serif",
+        "&:hover": { background: active ? "#f7fafd" : "#fafbfc" },
+        transition: "background 0.18s, box-shadow 0.18s",
       }}
       onClick={!active ? () => onSelect?.(id) : undefined}
     >
       <span
         style={{
-          display: "flex", alignItems: "center", marginRight: 13, color: "#b5b5c3",
-          cursor: active ? "grab" : "default", minWidth: 15
-        }} {...(active ? { ...listeners, ...attributes } : {})} tabIndex={-1}
+          display: "flex", alignItems: "center", marginRight: 10,
+          color: "#b5b5c3", cursor: active ? "grab" : "default", minWidth: 1,
+        }}
+        {...(active ? { ...listeners, ...attributes } : {})}
+        tabIndex={-1}
       >
         {active
-          ? <DragIndicatorOutlinedIcon sx={{ fontSize: 18 }} />
-          : <Box sx={{
-            height: 6, width: 6, bgcolor: "#b5b5c3", borderRadius: "50%", ml: 0.3, mr: 0.6
-          }} />}
+          ? <DragIndicatorOutlinedIcon sx={{ fontSize: 14 }} />
+          : <Box sx={{ height: 6, width: 6, bgcolor: "#b5b5c3", borderRadius: "50%", ml: 0.2, mr: 0.2 }} />}
       </span>
-      <Box sx={{ color: "#767e8c", mt: "1px", mr: 1 }}>{icon}</Box>
-      <Typography sx={{
-        flex: 1, fontWeight: active ? 700 : 500, fontSize: 15, color: active ? "#232b35" : "#bdbdbd"
-      }}>{label}</Typography>
+      <Box sx={{ color: "#767e8c", mt: "1px", mr:0.5 }}>{icon}</Box>
+      <Typography sx={{ flex: 1, fontWeight: active ? 700 : 500, fontSize: 11, color: active ? "#232b35" : "#bdbdbd" }}>{label}</Typography>
       <Box sx={{ display: "flex", gap: 1 }}>
         {type === "alpha" ? (
           <>
             <Button
               size="small"
               sx={{
-                borderRadius: 1, fontWeight: 700, px: 1.3, minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1, minWidth: 0,
                 background: active && direction === "asc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "asc" ? "#2196f3" : "#767e8c",
-                border: "1px solid #e3e8ef", fontSize: 13, boxShadow: "none",
+                border: "1px solid #e3e8ef", fontSize: 11, boxShadow: "none",
                 textTransform: "none", cursor: active ? "pointer" : "not-allowed",
-                opacity: active ? 1 : 0.6
+                opacity: active ? 1 : 0.6,
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "asc"); } }}
               disabled={!active}
@@ -76,12 +76,12 @@ function SortRow({
             <Button
               size="small"
               sx={{
-                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1, minWidth: 0,
                 background: active && direction === "desc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "desc" ? "#2196f3" : "#767e8c",
                 border: "1px solid #e3e8ef", fontSize: 13, boxShadow: "none",
                 textTransform: "none", cursor: active ? "pointer" : "not-allowed",
-                opacity: active ? 1 : 0.6
+                opacity: active ? 1 : 0.6,
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "desc"); } }}
               disabled={!active}
@@ -95,11 +95,11 @@ function SortRow({
             <Button
               size="small"
               sx={{
-                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0, fontSize: 13,
+                borderRadius: 1, fontWeight: 700, px: 1, minWidth: 0, fontSize: 11,
                 background: active && direction === "asc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "asc" ? "#2196f3" : "#767e8c",
                 border: "1px solid #e3e8ef", boxShadow: "none", textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6
+                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6,
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "asc"); } }}
               disabled={!active}
@@ -107,11 +107,11 @@ function SortRow({
             <Button
               size="small"
               sx={{
-                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0, fontSize: 13,
+                borderRadius: 1, fontWeight: 700, px: 1, minWidth: 0, fontSize: 11,
                 background: active && direction === "desc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "desc" ? "#2196f3" : "#767e8c",
                 border: "1px solid #e3e8ef", boxShadow: "none", textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6
+                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6,
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "desc"); } }}
               disabled={!active}
@@ -119,21 +119,18 @@ function SortRow({
           </>
         )}
       </Box>
-      {active && onRemove && (
+      {/* Only for selected sorters above divider */}
+      {active && onRemove &&
         <IconButton
           size="small"
           onClick={e => { e.stopPropagation(); onRemove(id); }}
-          sx={{
-            ml: 1.5, color: "#bdbdbd", "&:hover": { color: "#e53935" },
-          }}
+          sx={{ ml: 0.5, color: "#bdbdbd", "&:hover": { color: "#e53935" } }}
           tabIndex={-1}
-        ><CloseIcon sx={{ fontSize: 18 }} /></IconButton>
-      )}
+        ><CloseIcon sx={{ fontSize: 11 }} /></IconButton>
+      }
     </Box>
   );
 }
-
-// -- For Dragging --
 function SortableRow(props: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: props.id });
   return (
@@ -156,40 +153,29 @@ export default function SortModal({
 }) {
   const sensors = useSensors(useSensor(PointerSensor));
   const inactiveFields = ALL_FIELDS.filter((f) => !sortCriteria.find((c) => c.id === f.id));
+
   function handleDragEnd(event: any) {
     const { active, over } = event;
     if (active.id !== over.id) {
       const oldIndex = sortCriteria.findIndex((item) => item.id === active.id);
       const newIndex = sortCriteria.findIndex((item) => item.id === over.id);
-      const sorted = arrayMove(sortCriteria, oldIndex, newIndex);
-      setSortCriteria(sorted);
-      localStorage.setItem("clientSort", JSON.stringify(sorted));
+      setSortCriteria(arrayMove(sortCriteria, oldIndex, newIndex));
     }
   }
   function handleToggle(id: SortField, d: Direction) {
-    const updated = sortCriteria.map((c) =>
-      c.id === id ? { ...c, direction: d } : c
-    );
-    setSortCriteria(updated);
-    localStorage.setItem("clientSort", JSON.stringify(updated));
+    setSortCriteria(sortCriteria.map((c) => c.id === id ? { ...c, direction: d } : c));
   }
   function handleRemove(id: SortField) {
-    const updated = sortCriteria.filter((c) => c.id !== id);
-    setSortCriteria(updated);
-    localStorage.setItem("clientSort", JSON.stringify(updated));
+    setSortCriteria(sortCriteria.filter((c) => c.id !== id));
   }
   function handleClear() {
     setSortCriteria([]);
-    localStorage.removeItem("clientSort");
   }
   function handleSelectField(id: SortField) {
     const meta = ALL_FIELDS.find((f) => f.id === id)!;
     setSortCriteria([...sortCriteria, { id, direction: meta.defaultDir }]);
-    localStorage.setItem(
-      "clientSort",
-      JSON.stringify([...sortCriteria, { id, direction: meta.defaultDir }])
-    );
   }
+
   return (
     <Dialog
       open={open}
@@ -202,22 +188,17 @@ export default function SortModal({
           minWidth: 440,
           px: 2.5,
           py: 2,
+          fontFamily: "Inter, sans-serif",
         },
       }}
     >
-      <DialogTitle sx={{ fontWeight: 700, fontSize: 20, color: "#232b35" }}>
+      <DialogTitle sx={{ fontWeight: 700, fontSize: 15, color: "#232b35", fontFamily: "Inter,sans-serif" }}>
         Sort By
       </DialogTitle>
       <DialogContent sx={{ pt: 1, pb: 0, minWidth: 400 }}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={sortCriteria.map((c) => c.id)}
-            strategy={verticalListSortingStrategy}
-          >
+        {/* Selected above divider */}
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={sortCriteria.map((c) => c.id)} strategy={verticalListSortingStrategy}>
             {sortCriteria.map((c) => {
               const meta = ALL_FIELDS.find((f) => f.id === c.id)!;
               return (
@@ -236,35 +217,44 @@ export default function SortModal({
             })}
           </SortableContext>
         </DndContext>
-        {inactiveFields.length > 0 &&
-          inactiveFields.map((meta) => (
-            <SortRow
-              key={meta.id}
-              id={meta.id}
-              label={meta.label}
-              icon={meta.icon}
-              type={meta.type}
-              direction={meta.defaultDir}
-              active={false}
-              onSelect={handleSelectField}
-            />
-          ))}
-        <Box sx={{
-          color: "#898989", mt: 2, fontWeight: 500, cursor: "pointer",
-          fontSize: 15, pl: 0.5, "&:hover": { textDecoration: "underline" }
-        }}
+        {inactiveFields.length > 0 && <Divider sx={{ my: 1.4, bgcolor: "#ededed" }} />}
+        {/* Unselected below divider */}
+        {inactiveFields.map((meta) => (
+          <SortRow
+            key={meta.id}
+            id={meta.id}
+            label={meta.label}
+            icon={meta.icon}
+            type={meta.type}
+            direction={meta.defaultDir}
+            active={false}
+            onSelect={handleSelectField}
+          />
+        ))}
+      </DialogContent>
+      <DialogActions
+        sx={{ pr: 2.5, pb: 1, pt: 1, justifyContent: "space-between", gap: 2 }}
+      >
+        <Button
+          size="small"
           onClick={handleClear}
+          sx={{
+            minWidth: 60, borderRadius: 1.1, fontSize: 11,
+            border: "1px solid #ededed", background: "#fafbfc",
+            color: "#232b35", fontWeight: 600, boxShadow: "none",
+            textTransform: "none", "&:hover": { background: "#f5f5f5" },
+          }}
         >
           Clear all
-        </Box>
-      </DialogContent>
-      <DialogActions sx={{ pb: 1.2, pr: 2.5, mt: 1 }}>
+        </Button>
         <Button
-          size="large"
+          size="small"
           variant="contained"
           sx={{
-            px: 3.5, py: 1.1, borderRadius: 1.6, fontWeight: 700, fontSize: 16,
-            background: "#111", color: "#fff", boxShadow: "0 2px 8px rgba(30,41,59,0.09)",
+            minWidth: 80, px: 1.5, py: 0.7,
+            borderRadius: 1.1, fontWeight: 600, fontSize: 12,
+            background: "#111", color: "#fff",
+            boxShadow: "0 2px 8px rgba(30,41,59,0.09)",
             textTransform: "none", "&:hover": { background: "#232b35" },
           }}
           onClick={onClose}
