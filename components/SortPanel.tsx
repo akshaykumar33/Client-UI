@@ -7,44 +7,21 @@ import { DndContext, useSensor, useSensors, PointerSensor, closestCenter } from 
 import { SortableContext, useSortable, arrayMove, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import UpdateOutlinedIcon from "@mui/icons-material/UpdateOutlined";
-import NumbersOutlinedIcon from "@mui/icons-material/NumbersOutlined";
+import PermIdentityIcon from '@mui/icons-material/PermIdentity';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import InsertInvitationIcon from '@mui/icons-material/InsertInvitation';
 import CloseIcon from "@mui/icons-material/Close";
+import { SortCriteria, SortField, Direction } from "../types";
 
-// ------- TYPES --------
-export type SortField = "clientName" | "createdAt" | "updatedAt" | "clientId";
-export type Direction = "asc" | "desc";
-export interface SortCriterion {
-  id: SortField;
-  direction: Direction;
-}
-// All possible fields w/meta
 const ALL_FIELDS = [
-  {
-    id: "clientName", label: "Client Name",
-    icon: <PersonOutlineIcon />, type: "alpha" as const,
-    defaultDir: "asc" as Direction
-  },
-  {
-    id: "createdAt", label: "Created At",
-    icon: <CalendarTodayOutlinedIcon />, type: "date" as const,
-    defaultDir: "asc" as Direction
-  },
-  {
-    id: "updatedAt", label: "Updated At",
-    icon: <UpdateOutlinedIcon />, type: "date" as const,
-    defaultDir: "asc" as Direction
-  },
-  {
-    id: "clientId", label: "Client ID",
-    icon: <NumbersOutlinedIcon />, type: "alpha" as const,
-    defaultDir: "asc" as Direction
-  },
-];
+  { id: "clientName", label: "Client Name", icon: <PermIdentityIcon />, type: "alpha", defaultDir: "asc" as Direction },
+  { id: "createdAt", label: "Created At", icon: <CalendarMonthIcon />, type: "date", defaultDir: "asc" as Direction },
+  { id: "updatedAt", label: "Updated At", icon: <AccountBoxIcon />, type: "date", defaultDir: "asc" as Direction },
+  { id: "clientId", label: "Client ID", icon: <InsertInvitationIcon />, type: "alpha", defaultDir: "asc" as Direction },
+] as const;
 
-// ------- SINGLE ROW COMPONENT (used for both active/inactive) --------
+// Used for both draggable active and clickable disabled rows
 function SortRow({
   id, direction, label, icon, type, active,
   onToggle, onRemove, onSelect, listeners, attributes, isDragging
@@ -52,65 +29,42 @@ function SortRow({
   return (
     <Box
       sx={{
-        display: "flex",
-        alignItems: "center",
-        px: 0,
-        py: 1,
-        mb: 0.6,
-        cursor: active ? "grab" : "pointer",
+        display: "flex", alignItems: "center",
+        py: 1, mb: 0.6, cursor: active ? "grab" : "pointer",
         opacity: isDragging ? 0.66 : 1,
-        pointerEvents: isDragging ? "none" : "auto",
-        borderRadius: 2,
         background: active ? "#fff" : "#fafbfc",
-        border: "none",
-        boxShadow: isDragging ? "0 2px 18px rgba(30,41,59,0.10)" : "none",
-        "&:hover": {
-          background: "#f7fafd",
-        },
-        transition: "background 0.15s, box-shadow 0.18s"
+        borderRadius: 2, boxShadow: isDragging ? "0 2px 18px rgba(30,41,59,0.10)" : "none",
+        "&:hover": { background: "#f7fafd" }, transition: "background 0.15s, box-shadow 0.18s"
       }}
-      // For inactive rows, click to select
       onClick={!active ? () => onSelect?.(id) : undefined}
     >
-      {/* Drag or dot icon */}
       <span
         style={{
-          display: "flex", alignItems: "center", marginLeft: 2, marginRight: 13,
-          color: "#b5b5c3", cursor: active ? "grab" : "default", minWidth: 15
-        }}
-        {...(active ? { ...listeners, ...attributes } : {})}
-        tabIndex={-1}
+          display: "flex", alignItems: "center", marginRight: 13, color: "#b5b5c3",
+          cursor: active ? "grab" : "default", minWidth: 15
+        }} {...(active ? { ...listeners, ...attributes } : {})} tabIndex={-1}
       >
-        {active ? <DragIndicatorOutlinedIcon sx={{ fontSize: 18 }} /> : <Box sx={{
-          height: 6, width: 6, bgcolor: "#b5b5c3", borderRadius: "50%", ml: 0.3, mr: 0.6
-        }} />}
+        {active
+          ? <DragIndicatorOutlinedIcon sx={{ fontSize: 18 }} />
+          : <Box sx={{
+            height: 6, width: 6, bgcolor: "#b5b5c3", borderRadius: "50%", ml: 0.3, mr: 0.6
+          }} />}
       </span>
-      {/* Icon */}
       <Box sx={{ color: "#767e8c", mt: "1px", mr: 1 }}>{icon}</Box>
-      {/* Label */}
       <Typography sx={{
-        flex: 1, fontWeight: active ? 700 : 500, fontSize: 15, color: active ? "#232b35" : "#bdbdbd", letterSpacing: "0"
-      }}>
-        {label}
-      </Typography>
-      {/* Toggles */}
+        flex: 1, fontWeight: active ? 700 : 500, fontSize: 15, color: active ? "#232b35" : "#bdbdbd"
+      }}>{label}</Typography>
       <Box sx={{ display: "flex", gap: 1 }}>
         {type === "alpha" ? (
           <>
             <Button
               size="small"
               sx={{
-                borderRadius: 1,
-                fontWeight: 700,
-                px: 1.3,
-                minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1.3, minWidth: 0,
                 background: active && direction === "asc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "asc" ? "#2196f3" : "#767e8c",
-                border: "1px solid #e3e8ef",
-                fontSize: 13,
-                boxShadow: "none",
-                textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed",
+                border: "1px solid #e3e8ef", fontSize: 13, boxShadow: "none",
+                textTransform: "none", cursor: active ? "pointer" : "not-allowed",
                 opacity: active ? 1 : 0.6
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "asc"); } }}
@@ -118,23 +72,15 @@ function SortRow({
               startIcon={
                 <svg width="14" height="14" fill="none" viewBox="0 0 18 18"><path d="M9 5l3 3H6l3-3zm0 7v-5" stroke={active && direction === "asc" ? "#2196f3" : "#767e8c"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               }
-            >
-              A-Z
-            </Button>
+            >A-Z</Button>
             <Button
               size="small"
               sx={{
-                borderRadius: 1,
-                fontWeight: 700,
-                px: 1.2,
-                minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0,
                 background: active && direction === "desc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "desc" ? "#2196f3" : "#767e8c",
-                border: "1px solid #e3e8ef",
-                fontSize: 13,
-                boxShadow: "none",
-                textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed",
+                border: "1px solid #e3e8ef", fontSize: 13, boxShadow: "none",
+                textTransform: "none", cursor: active ? "pointer" : "not-allowed",
                 opacity: active ? 1 : 0.6
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "desc"); } }}
@@ -149,81 +95,67 @@ function SortRow({
             <Button
               size="small"
               sx={{
-                borderRadius: 1,
-                fontWeight: 700,
-                px: 1.2,
-                minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0, fontSize: 13,
                 background: active && direction === "asc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "asc" ? "#2196f3" : "#767e8c",
-                border: "1px solid #e3e8ef",
-                fontSize: 13,
-                boxShadow: "none",
-                textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed",
-                opacity: active ? 1 : 0.6
+                border: "1px solid #e3e8ef", boxShadow: "none", textTransform: "none",
+                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "asc"); } }}
               disabled={!active}
-            >
-              ↑ Newest to Oldest
-            </Button>
+            >↑ Newest to Oldest</Button>
             <Button
               size="small"
               sx={{
-                borderRadius: 1,
-                fontWeight: 700,
-                px: 1.2,
-                minWidth: 0,
+                borderRadius: 1, fontWeight: 700, px: 1.2, minWidth: 0, fontSize: 13,
                 background: active && direction === "desc" ? "#e7f4ff" : "#f7fafd",
                 color: active && direction === "desc" ? "#2196f3" : "#767e8c",
-                border: "1px solid #e3e8ef",
-                fontSize: 13,
-                boxShadow: "none",
-                textTransform: "none",
-                cursor: active ? "pointer" : "not-allowed",
-                opacity: active ? 1 : 0.6
+                border: "1px solid #e3e8ef", boxShadow: "none", textTransform: "none",
+                cursor: active ? "pointer" : "not-allowed", opacity: active ? 1 : 0.6
               }}
               onClick={e => { if (active) { e.stopPropagation(); onToggle(id, "desc"); } }}
               disabled={!active}
-            >
-              ↓ Oldest to Newest
-            </Button>
+            >↓ Oldest to Newest</Button>
           </>
         )}
       </Box>
-      {/* Remove button (only for active rows) */}
       {active && onRemove && (
         <IconButton
           size="small"
           onClick={e => { e.stopPropagation(); onRemove(id); }}
           sx={{
-            ml: 1.5,
-            color: "#bdbdbd",
-            "&:hover": { color: "#e53935" },
+            ml: 1.5, color: "#bdbdbd", "&:hover": { color: "#e53935" },
           }}
           tabIndex={-1}
-        >
-          <CloseIcon sx={{ fontSize: 18 }} />
-        </IconButton>
+        ><CloseIcon sx={{ fontSize: 18 }} /></IconButton>
       )}
     </Box>
   );
 }
 
-// ----------- MAIN MODAL COMPONENT -------------
+// -- For Dragging --
+function SortableRow(props: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: props.id });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 99 : "auto" }}
+    >
+      <SortRow {...props} attributes={attributes} listeners={listeners} isDragging={isDragging} />
+    </div>
+  );
+}
+
 export default function SortModal({
   open, onClose, sortCriteria, setSortCriteria
 }: {
   open: boolean;
   onClose: () => void;
-  sortCriteria: SortCriterion[];
-  setSortCriteria: (v: SortCriterion[]) => void;
+  sortCriteria: SortCriteria[];
+  setSortCriteria: (v: SortCriteria[]) => void;
 }) {
   const sensors = useSensors(useSensor(PointerSensor));
-
-  // Split: active (selected) and inactive (available)
   const inactiveFields = ALL_FIELDS.filter((f) => !sortCriteria.find((c) => c.id === f.id));
-
   function handleDragEnd(event: any) {
     const { active, over } = event;
     if (active.id !== over.id) {
@@ -250,7 +182,6 @@ export default function SortModal({
     setSortCriteria([]);
     localStorage.removeItem("clientSort");
   }
-  // Add a new sort criterion (when user clicks inactive row)
   function handleSelectField(id: SortField) {
     const meta = ALL_FIELDS.find((f) => f.id === id)!;
     setSortCriteria([...sortCriteria, { id, direction: meta.defaultDir }]);
@@ -259,8 +190,6 @@ export default function SortModal({
       JSON.stringify([...sortCriteria, { id, direction: meta.defaultDir }])
     );
   }
-
-  // ----------- RENDER -------------
   return (
     <Dialog
       open={open}
@@ -280,7 +209,6 @@ export default function SortModal({
         Sort By
       </DialogTitle>
       <DialogContent sx={{ pt: 1, pb: 0, minWidth: 400 }}>
-        {/* Active sorters draggable */}
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -308,7 +236,6 @@ export default function SortModal({
             })}
           </SortableContext>
         </DndContext>
-        {/* Available inactive sort fields */}
         {inactiveFields.length > 0 &&
           inactiveFields.map((meta) => (
             <SortRow
@@ -346,22 +273,5 @@ export default function SortModal({
         </Button>
       </DialogActions>
     </Dialog>
-  );
-}
-
-// -- For Dragging: useSortable helper
-function SortableRow(props: any) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: props.id });
-  return (
-    <div
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
-        zIndex: isDragging ? 99 : "auto",
-      }}
-    >
-      <SortRow {...props} attributes={attributes} listeners={listeners} isDragging={isDragging} />
-    </div>
   );
 }
