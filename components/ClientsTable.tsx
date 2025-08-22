@@ -41,6 +41,7 @@ const ClientsTable = ({ data }: { data: Client[] }) => {
             <TableCell>Email</TableCell>
             <TableCell>Status</TableCell>
             <TableCell>Type</TableCell>
+            <TableCell>Created At</TableCell>
             <TableCell>Updated At</TableCell>
             <TableCell>Updated By</TableCell>
           </TableRow>
@@ -90,6 +91,7 @@ const ClientsTable = ({ data }: { data: Client[] }) => {
                 />
               </TableCell>
               <TableCell>{client.type}</TableCell>
+              <TableCell>{client.createdAt}</TableCell>
               <TableCell>{client.updatedAt}</TableCell>
               <TableCell>{client.updatedBy}</TableCell>
             </TableRow>

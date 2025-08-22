@@ -14,10 +14,12 @@ import { clients as mockClients } from "../data/mockData";
 export default function ClientsPage() {
   const [tab, setTab] = useState<TabOption>("All");
   const [modalOpen, setModalOpen] = useState(false);
+
 const DEFAULT_SELECTED: SortCriteria[] = [
   { id: "clientName", direction: "asc" },
   { id: "createdAt", direction: "asc" }
 ];
+
 const [sortCriteria, setSortCriteria] = useState<SortCriteria[]>(DEFAULT_SELECTED);
 
   const [clients] = useState<Client[]>(mockClients);
@@ -46,6 +48,8 @@ const [sortCriteria, setSortCriteria] = useState<SortCriteria[]>(DEFAULT_SELECTE
             sortCriteria.map((sc) => {
               if (sc.id === "clientName") return "name";
               if (sc.id === "clientId") return "id";
+              if (sc.id === "createdAt") return "createdAt";
+              if (sc.id === "updatedAt") return "updatedAt";
               return sc.id;
             }),
             sortCriteria.map((sc) => sc.direction)
